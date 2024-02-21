@@ -81,7 +81,7 @@ void draw() {
   rotate(gearRotation);
   drawGear(0, 0, 80, 20, 30); // Draw gear at (0, 0) with radius 80, tooth height 20, and tooth count 30
   popMatrix();
-  gearRotation += 0.02; // Rotate the gear gradually
+  gearRotation += 0.02; // Rotates the gear gradually
 }
 
 void drawGear(float x, float y, float radius, float toothHeight, int toothCount) {
