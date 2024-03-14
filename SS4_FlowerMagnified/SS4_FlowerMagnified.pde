@@ -58,7 +58,7 @@ void drawStemAndFlower(float x, float y) {
   // Draw the stem
   rect(x - 10, y, 20, 100); 
   
-  // Set the fill color to pink for the flower
+  // color pink for the flower
   fill(255, 192, 203);
 
   // Draws the petals
@@ -69,7 +69,7 @@ void drawStemAndFlower(float x, float y) {
   ellipse(x, y - 20, 60, 60);
 
   // Flower's center
-  fill(255, 215, 0); // Set fill color to yellow
+  fill(255, 215, 0); // yellow
   ellipse(x, y - 50, 20, 20);
 }
 
