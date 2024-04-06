@@ -1,41 +1,35 @@
 // Jessica Gomez 
 // Theme: Garden 
 
-
 PImage cherryBlossom; // Variable to store the cherry blossom image
-//boolean cherryBlossomVisible = false; // Variable to track if the cherry blossom image is visible
-
-PImage lake; 
+PImage lake;
 
 boolean ellipseClicked = false;
-boolean triangleClicked = false; 
-boolean rectangleClicked = false; 
-
+boolean triangleClicked = false;
+boolean rectangleClicked = false;
 
 float rectWidth = 100; // Initial width of the rectangle
 float ellipseSize = 80; // Initial size of the ellipse
 float gearRotation = 0; // Initial rotation angle for the gear
 
-//int angle = 0;
 int radius = 150;
-int value = 0; // Initial Value for triangle 
+int[][] flowers = new int[100][2]; // Array to store flower positions, with space for up to 100 flowers
+int flowerCount = 0;
+int grassHeight = 50;
+
+float sunRotation = 0;
 
 void setup() {
   size(1080, 720);
   cherryBlossom = loadImage("cherry.blossom.png"); // Load the cherry blossom image
   lake = loadImage("lake.png");
+  background(137, 207, 240);
+
+  addFlower(width / 2, height - grassHeight / 2);
 }
 
 void draw() {
-  
-  /*
-  if (cherryBlossomVisible) {
-    drawCherryBlossomScreen();
-  } else {
-    drawMainScreen();
-  } 
-  */
-   if (!ellipseClicked && !triangleClicked && !rectangleClicked) {
+  if (!ellipseClicked && !triangleClicked && !rectangleClicked) {
     drawMainScreen();
   } else {
     if (ellipseClicked) {
@@ -47,18 +41,8 @@ void draw() {
     if (rectangleClicked) {
       drawRectangleScene();
     }
-  } 
+  }
 }
-
-/* void drawCherryBlossomScreen() {
-  background(225);
-  image(cherryBlossom, 0, 0, width, height);
-  fill(0);
-  textSize(20);
-  textAlign(CENTER);
-  text("Click anywhere to go back to the main screen and explore other parts of the garden", width/2, 30);
-}
-*/ 
 
 void drawMainScreen() {
   // Static elements
@@ -135,73 +119,140 @@ void drawGear(float x, float y, float radius, float toothHeight, int toothCount)
   endShape(CLOSE);
 }
 
-void drawEllipseScene(){
+void drawEllipseScene() {
   background(133, 193, 233);
   image(cherryBlossom, 0, 0, width, height);
   //grass 
-  fill(100,200,100);
-  rect(0,height-70, width, 70);
-  
+  fill(100, 200, 100);
+  rect(0, height - 70, width, 70);
+
   fill(0);
   textSize(20);
   textAlign(CENTER);
-  text("Click anywhere to go back to the main screen and explore other parts of the garden", width/2, 30);
-
+  text("Click anywhere to go back to the main screen and explore other parts of the garden", width / 2, 30);
 }
 
 void drawTriangleScene() {
   background(133, 193, 233);
-  image(lake,0,0,width, height);
+  image(lake, 0, 0, width, height);
   fill(0);
   textSize(20);
   textAlign(CENTER);
-  text("Opps you landed at the lake!", width/2, height/2);
+  text("Opps you landed at the lake!", width / 2, height / 2);
 }
 
 void drawRectangleScene() {
-  background(0);
-  fill(50);
+  background(137, 207, 240);
+
+  drawSun(width - 100, 100, 80, 20, 30);
+
+  fill(0, 255, 0);
+  rect(0, height - grassHeight, width, grassHeight);
+
+  for (int i = 0; i < flowerCount; i++) {
+    drawFlower(flowers[i][0], flowers[i][1]);
+  }
+
+  fill(0);
   textSize(20);
   textAlign(CENTER);
-  text(" NOT AVAILABLE", width/2,height/2);
+  text("Press 'b' key to make the flowers bloom press 'r' key to reset", width / 2, 30);
+
+  sunRotation += 0.04;
+}
+
+void drawSun(float x, float y, float radius, float toothHeight, int toothCount) {
+  pushMatrix(); // Stores transformation state
+  translate(x, y);
+  rotate(sunRotation); // Rotates subsequent drawing commands by the angle specified on Sun rotation vari
+  fill(225, 225, 0);
+  beginShape();
+  for (int i = 0; i < toothCount * 2; i++) { // Iterates tooth count *2 times
+  float angle = map(i, 0, toothCount * 2, 0, TWO_PI); // TWO_PI is twice the circumference of a circle so we need sin/ cosine b/c they complement
+  float toothSize = (i % 2 == 0) ? toothHeight : toothHeight * 1.5; // tooth size is ajusted with index within each iteration
+  float px = cos(angle) * (radius - toothSize);
+  float py = sin(angle) * (radius - toothSize);
+  vertex(px, py);
+}
+  endShape(CLOSE);
+  popMatrix();
+
+// Update rotation angle for sun
+ sunRotation += 0.2;
+}
+
+// Function to draw a flower at a given position
+ void drawFlower(int x, int y) {
+// Draw stem
+ fill(0, 255, 0); // Green color for stem
+ rect(x - 5, y + 50, 10, 100); // Stem
+
+// Draws petals
+ fill(128, 0, 128); // Purple
+ ellipse(x, y + 20, 60, 60);
+ ellipse(x - 30, y + 20, 60, 60);
+ ellipse(x + 30, y + 20, 60, 60);
+ ellipse(x, y - 10, 60, 60);
+ ellipse(x, y + 50, 60, 60);
+
+// Draws center
+ fill(255, 215, 0); // Yellow
+ ellipse(x, y + 20, 20, 20);
+}
+
+// Function to add a new flower at the given position
+ void addFlower(int x, int y) {
+// Conditional - Check if the flower position is within the grass area
+ if (y >= height - grassHeight) {
+// Check if the array is not full
+ if (flowerCount < flowers.length) {
+// Add flower to the array
+ flowers[flowerCount][0] = x;
+ flowers[flowerCount][1] = y - 100; // Adjusts the y-coordinate to place the flower above the grass
+ flowerCount++; // Increments flower count
+  }
+ }
+}
+
+ void keyPressed() {
+ if (key == 'b') {
+ addFlower((int)random(width), (int)random(height - grassHeight, height));
+ } else if (key == 'r') {
+   flowerCount = 0;
+ }
 }
 
 void mousePressed() {
-  /* if (cherryBlossomVisible) {
-    cherryBlossomVisible = false;
-  } else if (mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height) {
-    cherryBlossomVisible = true;
-  } */
-  
-  /*
-  Logic:!ellipseCLicked checks if the mouse is not clicked
-  it sets ellipseClicked to true, indicating that the ellipse was clicked.
-  and sets ther conditions to false.
-  
-  */
-    if (!ellipseClicked && mouseX > 320 && mouseX < 400 && mouseY > 190 && mouseY < 310) {  
-    ellipseClicked = true;
-    triangleClicked = false;
-    rectangleClicked = false;
-  } else if (!triangleClicked && mouseX > 200 && mouseX < 400 && mouseY > 450 && mouseY < 550) {
-    ellipseClicked = false;
-    triangleClicked = true;
-    rectangleClicked = false;
-  } else if (!rectangleClicked && mouseX > 600 && mouseX < 700 && mouseY > 200 && mouseY < 250) {
-    ellipseClicked = false;
-    triangleClicked = false;
-    rectangleClicked = true;
-  } else { //  else if none of the  conditions are met then all conditions are set to false
-    ellipseClicked = false;
-    triangleClicked = false;
-    rectangleClicked = false;
-  }
+
+/*
+Logic:!ellipseCLicked checks if the mouse is not clicked
+it sets ellipseClicked to true, indicating that the ellipse was clicked.
+and sets the other functions to false
+
+*/
+if (!ellipseClicked && mouseX > 320 && mouseX < 400 && mouseY > 190 && mouseY < 310) {
+ellipseClicked = true;
+triangleClicked = false;
+rectangleClicked = false;
+} else if (!triangleClicked && mouseX > 200 && mouseX < 400 && mouseY > 450 && mouseY < 550) {
+ellipseClicked = false;
+triangleClicked = true;
+rectangleClicked = false;
+} else if (!rectangleClicked && mouseX > 600 && mouseX < 700 && mouseY > 200 && mouseY < 250) {
+ellipseClicked = false;
+triangleClicked = false;
+rectangleClicked = true;
+} else { // else if none of the conditions are met then all conditions are set to false
+ellipseClicked = false;
+triangleClicked = false;
+rectangleClicked = false;
+ }
 }
 
 void startScreen() {
-  fill(0); // Black
-  textSize(20); // Text size
-  textAlign(CENTER, TOP);
-  text("You are viewing this mechanical garden from a space", width / 2, 10);
-  text("Click any shape to land on a specific part of the garden", width / 2, 40);
+fill(0); // Black
+textSize(20); // Text size
+textAlign(CENTER, TOP);
+text("You are viewing this mechanical garden from a space", width / 2, 10);
+text("Click any shape to land on a specific part of the garden", width / 2, 40);
 }
