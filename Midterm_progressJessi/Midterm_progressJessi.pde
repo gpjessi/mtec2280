@@ -7,6 +7,8 @@ PImage lake;
 boolean ellipseClicked = false;
 boolean triangleClicked = false;
 boolean rectangleClicked = false;
+boolean constructionClicked = false;
+boolean randomClicked = false;
 
 float rectWidth = 100; // Initial width of the rectangle
 float ellipseSize = 80; // Initial size of the ellipse
@@ -29,7 +31,7 @@ void setup() {
 }
 
 void draw() {
-  if (!ellipseClicked && !triangleClicked && !rectangleClicked) {
+  if (!ellipseClicked && !triangleClicked && !rectangleClicked && !constructionClicked && !randomClicked) {
     drawMainScreen();
   } else {
     if (ellipseClicked) {
@@ -40,6 +42,12 @@ void draw() {
     }
     if (rectangleClicked) {
       drawRectangleScene();
+    }
+    if (constructionClicked){
+      drawConstructionScene();
+    }
+    if (randomClicked) {
+      drawRandomScene(); 
     }
   }
 }
@@ -127,18 +135,20 @@ void drawEllipseScene() {
   rect(0, height - 70, width, 70);
 
   fill(0);
-  textSize(20);
+  textSize(35);
   textAlign(CENTER);
-  text("Click anywhere to go back to the main screen and explore other parts of the garden", width / 2, 30);
+  text("You landed at the only cherry blossom tree of the garden", width / 2, 30);
+  text("Press 'U' key to return to the main scene", width / 2, height - 30);
 }
 
 void drawTriangleScene() {
   background(133, 193, 233);
   image(lake, 0, 0, width, height);
-  fill(0);
-  textSize(20);
+  fill(255,255,255);
+  textSize(45);
   textAlign(CENTER);
   text("Opps you landed at the lake!", width / 2, height / 2);
+  text("Press 'U' key to return to the main scene", width / 2, height - 30);
 }
 
 void drawRectangleScene() {
@@ -154,9 +164,10 @@ void drawRectangleScene() {
   }
 
   fill(0);
-  textSize(20);
+  textSize(35);
   textAlign(CENTER);
   text("Press 'b' key to make the flowers bloom press 'r' key to reset", width / 2, 30);
+   text("Press 'U' key to return to the main scene", width / 2, height - 30);
 
   sunRotation += 0.04;
 }
@@ -219,6 +230,12 @@ void drawSun(float x, float y, float radius, float toothHeight, int toothCount) 
  addFlower((int)random(width), (int)random(height - grassHeight, height));
  } else if (key == 'r') {
    flowerCount = 0;
+ } else if (key == 'u') {
+   ellipseClicked = false;
+   triangleClicked = false;
+   rectangleClicked = false;
+   constructionClicked = false;
+   randomClicked = false;
  }
 }
 
@@ -230,29 +247,52 @@ it sets ellipseClicked to true, indicating that the ellipse was clicked.
 and sets the other functions to false
 
 */
-if (!ellipseClicked && mouseX > 320 && mouseX < 400 && mouseY > 190 && mouseY < 310) {
-ellipseClicked = true;
-triangleClicked = false;
-rectangleClicked = false;
-} else if (!triangleClicked && mouseX > 200 && mouseX < 400 && mouseY > 450 && mouseY < 550) {
-ellipseClicked = false;
-triangleClicked = true;
-rectangleClicked = false;
-} else if (!rectangleClicked && mouseX > 600 && mouseX < 700 && mouseY > 200 && mouseY < 250) {
-ellipseClicked = false;
-triangleClicked = false;
-rectangleClicked = true;
-} else { // else if none of the conditions are met then all conditions are set to false
-ellipseClicked = false;
-triangleClicked = false;
-rectangleClicked = false;
+if (!ellipseClicked && dist(mouseX, mouseY, 360, 250) < 40 && !triangleClicked && !rectangleClicked && !constructionClicked && !randomClicked) {
+    ellipseClicked = true;
+  } else if (!triangleClicked && mouseX > 200 && mouseX < 400 && mouseY > 450 && mouseY < 550 && !ellipseClicked && !rectangleClicked && !constructionClicked && !randomClicked) {
+    triangleClicked = true;
+  } else if (!rectangleClicked && mouseX > 600 && mouseX < 700 && mouseY > 200 && mouseY < 250 && !ellipseClicked && !triangleClicked && !constructionClicked && !randomClicked) {
+    rectangleClicked = true;
+  } else if (!constructionClicked && dist(mouseX, mouseY, 800, 450) < 40 && !ellipseClicked && !triangleClicked && !rectangleClicked && !randomClicked) {
+    constructionClicked = true;
+  } else if (!randomClicked && mouseX > 600 && mouseX < 700 && mouseY > 500 && mouseY < 600 && !ellipseClicked && !triangleClicked && !rectangleClicked && !constructionClicked) {
+    randomClicked = true;
  }
-}
-
+} 
 void startScreen() {
 fill(0); // Black
-textSize(20); // Text size
+textSize(35); // Text size
 textAlign(CENTER, TOP);
-text("You are viewing this mechanical garden from a space", width / 2, 10);
-text("Click any shape to land on a specific part of the garden", width / 2, 40);
+text("You are viewing this mechanical garden from space", width / 2, 10);
+text("Click any shape to land on a specific part of the garden", width / 2, 60);
+}
+
+void drawConstructionScene() {
+ background(255, 0, 0); // Red background
+  
+  fill(255); // White text color
+  textSize(48); // Big font size
+  textAlign(CENTER, CENTER);
+  text("Mechanical Room", width / 2, height / 2 - 40); 
+  text("Authorized Personnel Only", width / 2, height / 2 + 40); 
+  
+  fill(255);
+  textSize(25);
+  textAlign(CENTER);
+  text("Press 'U' key to return to the main scene", width / 2, height - 30);
+
+}
+
+void drawRandomScene() {
+  background(200, 0, 0);
+  fill(map(mouseX, 600, 700, 0, 255), map(mouseY, 500, 500 + rectWidth, 0, 255), 100); // Change color based on mouse position,map Re-maps a number from one range to another.
+  rect(600, 500, 100, rectWidth);
+  textSize(32);
+  textAlign(CENTER, CENTER);
+  text("Move mouse to any direction of scene and see the square and text color change", width / 2, height / 2);
+  
+  fill(255);
+  textSize(25);
+  textAlign(CENTER);
+  text("Press 'U' key to return to the main scene", width / 2, height - 30);
 }
